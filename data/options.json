@@ -1,0 +1,43 @@
+{    
+    "tmpFolderPath": "/mnt/c/source/stockWebApp/data/tmp",
+    "logFileName": "logs.txt",
+    "logLevel":  "INFO",    
+    "dbPath": "/mnt/c/source/stockWebApp/data",
+    "httpHeaders": [
+        {
+            "key": "UserAgent",
+            "value": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:88.0) Gecko/20100101 Firefox/88.0"
+        },
+        {
+            "key": "Host",
+            "value": "www1.nseindia.com"
+        },
+        {
+            "key": "Referer",
+            "value": "https://www1.nseindia.com/products/content/equities/equities/archieve_eq.htm"
+        }
+    ],
+    "nseUrls": {
+        "EquityListUrl": "https://www1.nseindia.com/content/equities/EQUITY_L.csv",
+        "ETFListUrl": "https://www1.nseindia.com/content/equities/eq_etfseclist.csv",        
+        "BhavUrl": "https://www1.nseindia.com/content/historical/EQUITIES/{yyyy}/{MMM}/cm{ddMMMyyyy}bhav.csv.zip",
+        "IndexBhavUrl": "https://www1.nseindia.com/content/indices/ind_close_all_{dd}{MM}{yyyy}.csv",
+        "DeliveryPositionUrl": "https://www1.nseindia.com/archives/equities/mto/MTO_{dd}{MM}{yyyy}.DAT",
+        "PledgedSummaryUrl": "https://www1.nseindia.com/corporates/datafiles/pledge_summary_data.csv",
+        "Indexes": [
+            "https://www1.nseindia.com/content/indices/ind_nifty50list.csv",
+            "https://www1.nseindia.com/content/indices/ind_nifty100list.csv",
+            "https://www1.nseindia.com/content/indices/ind_nifty200list.csv",
+            "https://www1.nseindia.com/content/indices/ind_nifty500list.csv",
+            "https://www1.nseindia.com/content/indices/ind_niftynext50list.csv",
+            "https://www1.nseindia.com/content/indices/ind_niftylargemidcap250list.csv",
+            "https://www1.nseindia.com/content/indices/ind_niftymidcap50list.csv",
+            "https://www1.nseindia.com/content/indices/ind_niftymidcap100list.csv",
+            "https://www1.nseindia.com/content/indices/ind_niftymidcap150list.csv",
+            "https://www1.nseindia.com/content/indices/ind_niftysmallcap50list.csv",
+            "https://www1.nseindia.com/content/indices/ind_niftysmallcap100list.csv",          
+            "https://www1.nseindia.com/content/indices/ind_niftysmallcap250list.csv",
+            "https://www1.nseindia.com/content/indices/ind_niftymidsmallcap400list.csv"
+        ]
+    }
+}

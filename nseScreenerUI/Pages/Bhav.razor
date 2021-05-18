@@ -1,0 +1,58 @@
+@page "/BhavData"
+
+@using System.Linq;
+@using nseScreenerUI.Data
+@inject NseStockDataBaseService NseStockDataBaseService
+
+@if(bhavData == null)
+{
+<h1> Bhav Data not available. Database might be empty. Try updating</h1>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-2">
+            <h2>@updatedDateString</h2>
+        </div>
+        <div class="col-md-6">
+            <RadzenDropDown AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" 
+                            Multiple="true" Placeholder="Filter by industry..." 
+                            Data=@listOfIndustries Change=@onChange @bind-Value=@multipleValues 
+                            Style="width:600px;height:40px;font-size:20px;text-align: left;" />
+        </div>
+    </div>
+    <hr/>
+    <div class="row"><div class="col-md-12">
+        <BhavDetails BhavData="@bhavData" />
+    </div></div>
+}
+
+@code 
+{    
+    private string updatedDateString;
+    IEnumerable<string> multipleValues = new string[] { };    
+    private DateTime lastUpdateDate;
+    private IEnumerable<BhavInformation> bhavDataOriginal = null;
+    private IEnumerable<BhavInformation> bhavData = null;
+    private IEnumerable<string> listOfIndustries {get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {        
+        updatedDateString = await NseStockDataBaseService.GetLastUpdatedDate();
+        if(DateTime.TryParse(updatedDateString, out lastUpdateDate))
+        {
+            bhavDataOriginal = bhavData = await NseStockDataBaseService.GetBhavForDate(lastUpdateDate);
+            listOfIndustries = bhavData.Select(x => x.industry).OrderBy(x => x).Distinct().Append("All");            
+        }
+    }
+
+    void onChange()
+    {
+        if(multipleValues == null || multipleValues.Count() == 0 || multipleValues.Contains("All")) {
+            bhavData = bhavDataOriginal;
+            return;
+        }
+        bhavData = bhavDataOriginal.Where(x => multipleValues.Contains(x.industry));
+        //bhavData = bhavDataOriginal.Where(x => x.industry.ToLower().CompareTo(selectedIndustry.ToLower()) == 0);
+    }
+}

@@ -1,0 +1,76 @@
+﻿@page "/CompanyList"
+
+@using nseScreenerUI.Data
+@inject NseStockDataBaseService NseStockDataBaseService
+
+<div class="row">
+    <div class="col-xl-6">
+            <h1>List of companies</h1>
+    </div>
+    <div class="col-xl-6">
+        <RadzenButton Click="@ToggleCompanyInformation"  Text="@buttonText" Style="margin-bottom: 20px; width: 150px" />
+    </div>    
+</div>
+
+@if (listOfCompanies == null)
+{
+    <p><em>Loading companies from database...</em></p>
+}
+else
+{
+@if(!showETF) {
+    <RadzenGrid @ref="companyListGrid" WrapItems="true" AllowPaging="true" Data="@listOfEquities" TItem="CompanyInformation" 
+                AllowSorting="true" PageSize="50" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" 
+                FilterMode="FilterMode.Simple">
+        <Columns>
+            <RadzenGridColumn TItem="CompanyInformation" Property="companyName" Title="Company Name">
+                <HeaderTemplate>
+                    Company Name (Filtered <b>@companyListGrid.View.Count()</b> of <b>@listOfEquities.Count()</b>)
+                </HeaderTemplate>
+            </RadzenGridColumn>
+            <RadzenGridColumn TItem="CompanyInformation" Property="symbol" Title="Symbol"/>
+            <RadzenGridColumn TItem="CompanyInformation" Property="series" Title="Series"/>
+            <RadzenGridColumn TItem="CompanyInformation" Property="industry" Title="Industry" />
+            <RadzenGridColumn TItem="CompanyInformation" Property="promotorOwnerShipPct" Title="Promotor OwnerShip %" />            
+            <RadzenGridColumn TItem="CompanyInformation" Property="promotorPledgedPct" Title="promotors Pledged %" />
+            <RadzenGridColumn TItem="CompanyInformation" Property="totalPledgedPct" Title="total Pledged %" />            
+        </Columns>
+    </RadzenGrid>
+} else {
+    <RadzenGrid @ref="etfListGrid" WrapItems="true" AllowPaging="true" Data="@listOfETF" TItem="CompanyInformation" 
+                AllowSorting="true" PageSize="50" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" 
+                FilterMode="FilterMode.Simple">
+        <Columns>
+            <RadzenGridColumn TItem="CompanyInformation" Property="symbol" Title="Symbol">
+                <HeaderTemplate>
+                    Company Name (Filtered <b>@etfListGrid.View.Count())</b> of <b>@listOfETF.Count()</b>)
+                </HeaderTemplate>
+            </RadzenGridColumn>
+            <RadzenGridColumn TItem="CompanyInformation" Property="underlying" Title="Underlying" />
+        </Columns>
+    </RadzenGrid>
+}
+}
+
+@code {
+    RadzenGrid<CompanyInformation> companyListGrid;
+    RadzenGrid<CompanyInformation> etfListGrid;
+    private IEnumerable<CompanyInformation> listOfCompanies = null;   
+    private IEnumerable<CompanyInformation> listOfEquities = null;   
+    private IEnumerable<CompanyInformation> listOfETF = null;
+    private string buttonText = "ETF";
+    private bool showETF = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        listOfCompanies = await NseStockDataBaseService.GetListOfCompanies();
+        listOfEquities = listOfCompanies.Where(x => !x.isETF);
+        listOfETF = listOfCompanies.Where(x => x.isETF);
+    }
+
+    void ToggleCompanyInformation()
+    {
+        showETF = !showETF;
+        buttonText = showETF ? "Equity" : "ETF";
+    }
+}

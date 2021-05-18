@@ -1,0 +1,20 @@
+@page "/admin"
+@using nseScreenerUI.Data
+
+@inject NseStockDataBaseService NseStockDataBaseService
+<div style="margin-top:20px">Data Updated until <b>@updatedDateString</b> </div>
+<br/>
+<RadzenButton Click=@OnClick Text="Update Data to Latest" Style="margin-bottom: 20px; width: 150px" />
+
+@code {
+    private string updatedDateString;
+
+    protected override async Task OnInitializedAsync()
+    {        
+        updatedDateString = await NseStockDataBaseService.GetLastUpdatedDate();
+    }
+    private void OnClick()
+    {
+        NseStockDataBaseService.Update();
+    }
+}

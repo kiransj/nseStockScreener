@@ -1,0 +1,96 @@
+@using nseScreenerUI.Data
+@inject NseStockDataBaseService NseStockDataBaseService
+
+@if(_bhavData != null)
+{
+<RadzenGrid @ref="bhavListGrid" WrapItems="true" AllowPaging="true" Data="@BhavData" TItem="BhavInformation" 
+            AllowSorting="true" PageSize="50" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" 
+            FilterMode="FilterMode.Simple" Style="font-size: 20px;">
+    <Template Context="data">            
+        <CompanyDetails CompanyID="@data.companyId" />        
+    </Template>
+    <Columns >
+            <RadzenGridColumn TItem="BhavInformation" Property="symbol" Title="Symbol">
+                <Template Context="data">
+                <p style="color: @computeColor(data)">@data.symbol</p>
+                </Template>
+            </RadzenGridColumn>
+            <RadzenGridColumn TItem="BhavInformation" Property="series" Title="Series">
+                <Template Context="data">
+                    <p style="color: @computeColor(data)">@data.series</p>
+                </Template>
+            </RadzenGridColumn>
+            <RadzenGridColumn TItem="BhavInformation" Property="Close" Title="Close">
+                <Template Context="data">
+                <p style="color: @computeColor(data)">@data.Close</p>
+                </Template>
+            </RadzenGridColumn>
+            <RadzenGridColumn TItem="BhavInformation" Property="priceChangePct" Title="Change">
+                <Template Context="data">
+                <p style="color: @computeColor(data)">@string.Format("{0:0.00}", data.priceChangePct)</p>
+                </Template>
+            </RadzenGridColumn>
+            <RadzenGridColumn TItem="BhavInformation" Property="PrevClose" Title="Prev Close">
+                <Template Context="data">
+                <p style="color: @computeColor(data)">@data.PrevClose</p>
+                </Template>
+            </RadzenGridColumn>
+            <RadzenGridColumn TItem="BhavInformation" Property="TotTradedQty" Title="Traded Qty">
+                <Template Context="data">
+                <p style="color: @computeColor(data)">@data.TotTradedQty</p>
+                </Template>
+            </RadzenGridColumn>             
+            <RadzenGridColumn TItem="BhavInformation" Property="TotTradedValue" Title="Trade Value">
+                <Template Context="data">
+                <p style="color: @computeColor(data)">@convertValuetoString(data.TotTradedValue)</p>
+                </Template>
+            </RadzenGridColumn>
+            <RadzenGridColumn TItem="BhavInformation" Property="deliverableQuantityPct" Title="Del Qty %">
+                <Template Context="data">
+                <p style="color: @computeColor(data)">@data.deliverableQuantityPct</p>
+                </Template>
+            </RadzenGridColumn>
+    </Columns>
+</RadzenGrid>
+}
+else
+{
+    <h2>BhavData is NULL</h2>
+}
+
+@code
+{
+    private RadzenGrid<BhavInformation> bhavListGrid;
+    private IEnumerable<BhavInformation> _bhavData = null;
+    [Parameter]
+    public IEnumerable<BhavInformation> BhavData {get; set;}
+
+    private string computeColor(BhavInformation bhav)
+    {
+        return bhav.priceChangePct > 0 ? "green": "red";
+    }
+
+    protected override void OnInitialized()
+    {
+        if(BhavData != null)
+        {
+            _bhavData = BhavData.Count() > 0 ? BhavData : null;
+        }
+        
+    }
+
+    private string convertValuetoString(double value)
+    {
+        double oneLakh = 100000.0;
+        double res = value/oneLakh;
+        if(res < 100.0) 
+        {
+            return string.Format($"{res.ToString("#.00")}L");
+        }
+        else 
+        {
+            res = res/100.0;
+            return string.Format($"{res.ToString("#.00")}C");
+        }
+    }
+}

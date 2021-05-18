@@ -1,0 +1,89 @@
+@using Data
+@using System.Globalization
+@inject NseStockDataBaseService NseStockDataBaseService
+
+@if(info == null)
+{
+    <h1>Company ID @CompanyID not found</h1>
+}
+else 
+{
+    <RadzenCard >
+        <div class="row">        
+            <div class="col-md-2">
+                <div>Company:</div>
+                <b>@info.companyName</b>
+                <div style="margin-top:20px"> Industry:</div>
+                <b>@info.industry</b>
+                @if(info.industry != "ETF") {
+                    <div style="margin-top:20px">Market Cap:</div>
+                    <b>@(NseStockDataBaseService.convertValuetoString(info.TotalNumberOfShares * lastTradedPrice))</b>
+                    <div style="margin-top:20px">Promoter Ownership</div>
+                    <b>@string.Format($"{info.promotorOwnerShipPct}%")</b>
+                    <div style="margin-top:20px">Promoter Ownership Pledged</div>
+                    <b>@string.Format($"{info.promotorPledgedPct}%")</b>
+                    <div style="margin-top:20px">Total Pledged</div>
+                    <b>@string.Format($"{info.totalPledgedPct}%")</b>
+                } else {
+                    <div style="margin-top:20px">Underlying</div>
+                    <b>@string.Format($"{info.underlying}")</b>
+                }
+                <br />
+            </div>
+            <div class="col-md-10">
+                <div class="row"><div class="col-md-12">
+                    <RadzenChart>
+                        <RadzenLineSeries  Smooth="true" Data="@priceHistory" CategoryProperty="dateTime" Title="Price Graph" LineType="LineType.Solid" ValueProperty="value">
+                            <RadzenMarkers MarkerType="MarkerType.Circle" />
+                        </RadzenLineSeries>
+                        <RadzenCategoryAxis Padding="20" FormatString="{0:dd-MM}">
+                            <RadzenAxisTitle Text="" />
+                        </RadzenCategoryAxis>
+                        <RadzenValueAxis>
+                            <RadzenGridLines Visible="true" />
+                            <RadzenAxisTitle Text="" />
+                        </RadzenValueAxis>
+                    </RadzenChart>
+                </div></div>
+                <div class="row"><div class="col-md-12">
+                <RadzenChart>
+                    <RadzenLineSeries  Smooth="true" Data="@totalTradedQtyHistory" CategoryProperty="dateTime" Title="Traded QTY" LineType="LineType.Solid" ValueProperty="value">
+                        <RadzenMarkers MarkerType="MarkerType.Circle" />
+                    </RadzenLineSeries>
+                    <RadzenLineSeries  Smooth="true" Data="@deliveryQtyHistory" CategoryProperty="dateTime" Title="Delivery QTY" LineType="LineType.Solid" ValueProperty="value">
+                        <RadzenMarkers MarkerType="MarkerType.Square" />
+                    </RadzenLineSeries>
+                    <RadzenCategoryAxis Padding="20" FormatString="{0:dd-MM}">
+                        <RadzenAxisTitle Text="" />
+                    </RadzenCategoryAxis>
+                    <RadzenValueAxis>
+                        <RadzenGridLines Visible="true" />
+                        <RadzenAxisTitle Text="" />
+                    </RadzenValueAxis>
+                </RadzenChart>
+                </div></div>
+            </div>  
+        </div>
+    </RadzenCard>
+}
+@code {
+    // Demonstrates how a parent component can supply parameters
+    [Parameter]
+    public int CompanyID { get; set; }
+    
+    private double lastTradedPrice;
+
+    private CompanyInformation info = null;
+    private IEnumerable<ValueHistory> priceHistory = null;
+    private IEnumerable<ValueHistory> deliveryQtyHistory = null;
+    private IEnumerable<ValueHistory> totalTradedQtyHistory = null;
+    protected override async Task OnInitializedAsync()
+    {
+        info = await NseStockDataBaseService.GetCompanyDetails(CompanyID);
+        priceHistory = await NseStockDataBaseService.GetPriceGraphForCompany(CompanyID);
+        deliveryQtyHistory = await NseStockDataBaseService.GetDeliveryQtyForCompany(CompanyID);
+        totalTradedQtyHistory = await NseStockDataBaseService.GetTotalTradedQtyForCompany(CompanyID);
+
+        lastTradedPrice = priceHistory.OrderBy(x => x.dateTime).Last().value;
+    }
+}
